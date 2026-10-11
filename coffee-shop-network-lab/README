@@ -1,0 +1,105 @@
+A secure small-business network built from scratch in Cisco Packet Tracer for a fictional coffee shop owner. The design segments an office, a point-of-sale (POS) system and public guest Wi-Fi into separate VLANs, routes between them with router-on-a-stick, hands out addresses with DHCP, and uses an ACL to keep guests away from internal business resources.
+
+Scenario: Mike is opening a coffee shop next week and has no network. He needs a secure office network, a reliable POS system for card payments, and free Wi-Fi for customers, all kept properly separated.
+
+Skills Demonstrated
+Requirements gathering and translating business needs into a network design
+VLAN design and switch port assignment (with future growth planned in)
+802.1Q trunking with an allowed-VLAN list
+Inter-VLAN routing with router-on-a-stick (subinterfaces)
+DHCP on a Cisco router (excluded ranges, per-VLAN pools)
+Extended named ACLs for guest isolation (including the DHCP permit-ordering pitfall)
+Device hardening: secret passwords, password encryption, login banners, console protection
+Secure remote management with SSH (no Telnet) on a dedicated management VLAN
+Verification, testing and documentation habits
+Topology
+Gi0/0 WAN
+Gi0/1 802.1Q trunk
+Fa0/1 VLAN 10
+Fa0/2 VLAN 10
+Fa0/6 VLAN 20
+Fa0/7 VLAN 20
+Fa0/11 VLAN 30
+Wi-Fi
+Internet Service Provider
+RouterMikesCoffeeShop-R1
+SwitchMikesCoffeeShop-SW1
+Manager PC
+Office Printer
+POS Terminal
+Receipt Printer
+Wireless Access Point
+Guest Laptop
+
+Add your own Packet Tracer screenshot to screenshots/ and your .pkt file to topology/.
+
+Design at a Glance
+VLAN	Name	Purpose	Subnet	Gateway
+10	MGMT-OFFICE	Manager PC and office printer	192.168.10.0/24	192.168.10.1
+20	POS	POS terminal and receipt printer	192.168.20.0/24	192.168.20.1
+30	GUEST-WIFI	Customer wireless	192.168.30.0/24	192.168.30.1
+99	NETWORK-MGMT	Switch and infrastructure management	192.168.99.0/24	192.168.99.1
+
+The first 20 addresses of each subnet are reserved for infrastructure and static devices (gateways, printers, switch SVI).
+
+Note on values: VLAN IDs 10/30/99 and the general design come from the original walkthrough. Subnets, exact port numbers, DNS server and SSID are a reference plan documented in docs/02-addressing-and-port-map.md. Adjust them if your .pkt file differs.
+
+Documentation
+Document	Description
+Full documentation (PDF)	All six docs plus the configs in one printable 17-page file
+01 Requirements and Design	Client brief, site survey, design decisions, cabling
+02 Addressing and Port Map	VLAN plan, subnets, switch port and router interface maps
+03 Configuration Walkthrough	Step-by-step build with the reasoning behind each command
+04 Verification and Testing	Show commands, test plan and expected results
+05 Troubleshooting	Symptom, cause and fix table
+06 Limitations and Next Steps	Known gaps, hardening ideas, roadmap
+Repository Structure
+mikes-coffee-shop-network/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── configs/
+│   ├── switch-config.txt        # Full switch configuration
+│   ├── router-config.txt        # Full router configuration
+│   └── end-devices.md           # Static IPs and wireless settings
+├── docs/
+│   ├── 01-requirements-and-design.md
+│   ├── 02-addressing-and-port-map.md
+│   ├── 03-configuration-walkthrough.md
+│   ├── 04-verification-and-testing.md
+│   ├── 05-troubleshooting.md
+│   ├── 06-limitations-and-next-steps.md
+│   └── Mikes-Coffee-Shop-Network-Documentation.pdf   # Combined PDF
+├── screenshots/                 # Topology and test evidence
+└── topology/                    # Packet Tracer .pkt file
+How to Reproduce
+Open Packet Tracer and build the topology in docs/01-requirements-and-design.md using the cabling in docs/02-addressing-and-port-map.md.
+Paste configs/switch-config.txt into the switch CLI, then configs/router-config.txt into the router CLI.
+Configure end devices and the wireless client using configs/end-devices.md.
+Run the checks in docs/04-verification-and-testing.md.
+
+Replace every <CHANGE_ME> placeholder with your own credentials. Never commit real passwords from production devices.
+
+Results
+Test	Expected	Result
+Office PC to gateway, printer, POS (inter-VLAN)	Success	Pass
+POS terminal to gateway and receipt printer	Success	Pass
+Guest laptop to its own gateway	Success	Pass
+Guest laptop to Office VLAN	Blocked	Pass
+Guest laptop to POS VLAN	Blocked	Pass
+
+Full steps are in docs/04-verification-and-testing.md.
+
+Known Limitations
+The ISP-facing interface has no IP address, so there is no NAT, default route or real internet access yet. This is the next lab.
+The access point is placed in the guest VLAN for lab simplicity. Production designs usually manage the AP from a separate management VLAN.
+
+See docs/06-limitations-and-next-steps.md.
+
+Author
+
+XypherSec — Cybersecurity analyst and web application penetration tester GitHub: github.com/XypherSec
+
+License
+
+Released under the MIT License. This is a learning lab for educational purposes.
